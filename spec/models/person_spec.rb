@@ -2,19 +2,21 @@ require 'spec_helper'
 
 describe Person do
 
-  let(:quote) { FactoryGirl.create(:quotation)}
+  let(:quotation) { FactoryGirl.create(:quotation)}
 
-  before do
+  before(:each) do
 
-    @person = quote.build_person(title: 'Mr',forename: 'Jack',surname: 'Johnson',email:'jj1@aber.ac.uk',
+    @person = quotation.build_person(title: 'Mr',forename: 'Jack',surname: 'Johnson',email:'jj1@aber.ac.uk',
               dob: Date.new(1990,12,8),telephone: '07962453187',street: 'park lane', city: 'liberty city', county: 'Dari',
               postcode: 'DR45 7TY',license_type: 'full',license_period: 4,occupation: 'teacher',number_incidents: 0)
 
   end
-
   subject {@person}
 
   it {should respond_to(:quotation_id)}
+  it {should respond_to(:quotation)}
+  its(:quotation) {should eq quotation}
+
   it {should respond_to(:forename)}
   it {should respond_to(:surname)}
   it {should respond_to(:email)}
@@ -90,6 +92,10 @@ describe Person do
   describe "when number incidents is not a number" do
     before { @person.number_incidents = 'ten'}
     it { should_not be_valid }
+  end
+
+  describe "person quotation id equals quotation id" do
+    its(:quotation_id) {should eq quotation.id}
   end
 
 end

@@ -4,13 +4,12 @@ FactoryGirl.define do
 
     premium     3000
     calculation_date    Date.new(2000,1,1)
-    sequence(:code) {|n| "code#{n}" }
+    sequence(:code) {|n| "code#{n}"}
 
   end
 
   factory :person do
 
-    quotation
     forename "John"
     surname "Jackson"
     email "jj55@aber.ac.uk"
@@ -24,6 +23,7 @@ FactoryGirl.define do
     license_period 6
     occupation "builder"
     number_incidents 2
+    quotation
 
   end
 

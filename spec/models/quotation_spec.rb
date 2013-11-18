@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Quotation do
 
-  before { @quotation = Quotation.new(premium: 1000, calculation_date: Date.new(2006,11,27), code:"C123")}
+  before(:each) {@quotation = Quotation.new(premium: 1000, calculation_date: Date.new(2006,11,27), code:"C123")}
 
   subject { @quotation }
 
@@ -32,34 +32,30 @@ describe Quotation do
     before {@quotation.save}
     let(:found_quote) {Quotation.find_by(code: "C123")}
 
-    it {should eq @quotation}
+    it {found_quote.should eq @quotation}
   end
 
   describe "two quotations with same code" do
-
     before do
-    other_quote = @quotation.dup
-    other_quote.code = @quotation.code.upcase
-    other_quote.save
+     other_quote = @quotation.dup
+     other_quote.save
     end
-    it {should_not be_valid}
+
+    it { should_not be_valid}
   end
 
    describe "person association" do
-
-     before { @quotation.save }
-     let!(:person) do
-       FactoryGirl.create(:person, quotation: @quotation)
-     end
+     let(:quote) {FactoryGirl.create(:quotation)}
+     let(:person) {FactoryGirl.create(:person, quotation: quote)}
+     it {person.quotation_id.should eq quote.id}
 
      it "should destroy associated person" do
-
-       person = @quotation.person
-       @quotation.destroy
-       expect(Person.where(id: person.id)).to be_empty
-
-     end
+       other = person
+       quote.destroy
+       Person.where(quotation_id: other.quotation_id).should_not exist
 
    end
+
+  end
 
 end
