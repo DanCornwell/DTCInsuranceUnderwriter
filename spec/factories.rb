@@ -47,4 +47,14 @@ FactoryGirl.define do
 
   end
 
+  factory :incident do
+
+    incident_date Date.new(2000,1,1)
+    claim_sum 300
+    incident_type "Single vehicle collision"
+    description "Its a description"
+    quotation
+
+  end
+
 end

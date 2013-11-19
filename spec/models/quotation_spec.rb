@@ -10,6 +10,9 @@ describe Quotation do
   it { should respond_to(:calculation_date)}
   it { should respond_to(:code)}
   it { should respond_to(:person)}
+  it { should respond_to(:policy)}
+  it { should respond_to(:vehicle)}
+  it { should respond_to(:incidents)}
 
   it {should be_valid}
 
@@ -50,15 +53,28 @@ describe Quotation do
      let(:person) {FactoryGirl.create(:person, quotation: @quotation)}
      let(:policy) {FactoryGirl.create(:policy, quotation: @quotation)}
      let(:vehicle) {FactoryGirl.create(:vehicle, quotation: @quotation)}
+     let(:incident1) {FactoryGirl.create(:incident, quotation: @quotation)}
+     let(:incident2) {FactoryGirl.create(:incident, quotation: @quotation)}
+     let(:incident3) {FactoryGirl.create(:incident, quotation: @quotation)}
 
      it "Quotation should have associations" do
        person.save
        policy.save
        vehicle.save
+       incident1.save
+       incident2.save
+       incident3.save
 
        Person.where(quotation_id: @quotation.id).should exist
        Policy.where(quotation_id: @quotation.id).should exist
        Vehicle.where(quotation_id: @quotation.id).should exist
+       incidents = @quotation.incidents.to_a
+       expect(incidents).not_to be_empty
+       expect(incidents.length).to eq 3
+       incidents.each do |incident|
+         Incident.where(id: incident.id).should exist
+        (incident.quotation_id).should eq @quotation.id
+       end
 
      end
 
@@ -67,7 +83,10 @@ describe Quotation do
        Person.where(quotation_id: @quotation.id).should_not exist
        Policy.where(quotation_id: @quotation.id).should_not exist
        Vehicle.where(quotation_id: @quotation.id).should_not exist
-
+       incidents = @quotation.incidents.to_a
+       incidents.each do |incident|
+         Incident.where(id: incident.id).should_not exist
+       end
      end
 
   end
