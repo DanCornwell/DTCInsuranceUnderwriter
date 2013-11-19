@@ -6,9 +6,9 @@ describe Person do
 
   before(:each) do
 
-    @person = quotation.build_person(title: 'Mr',forename: 'Jack',surname: 'Johnson',email:'jj1@aber.ac.uk',
+    @person = quotation.create_person(title: 'Mr',forename: 'Jack',surname: 'Johnson',email:'jj1@aber.ac.uk',
               dob: Date.new(1990,12,8),telephone: '07962453187',street: 'park lane', city: 'liberty city', county: 'Dari',
-              postcode: 'DR45 7TY',license_type: 'full',license_period: 4,occupation: 'teacher',number_incidents: 0)
+              postcode: 'DR45 7TY',license_type: 'Full',license_period: 4,occupation: 'teacher',number_incidents: 0)
 
   end
   subject {@person}
@@ -54,6 +54,11 @@ describe Person do
     it { should_not be_valid }
   end
 
+  describe "when dob is not 17 years ago" do
+    before { @person.dob = Date.new(2007,11,8)}
+    it { should_not be_valid }
+  end
+
   describe "when telephone is not valid format" do
     before { @person.telephone = '09863tel'}
     it { should_not be_valid }
@@ -96,6 +101,18 @@ describe Person do
 
   describe "person quotation id equals quotation id" do
     its(:quotation_id) {should eq quotation.id}
+  end
+
+  describe "retrieval via quotation id" do
+
+    it "should find person connecting to quotation" do
+      Person.where(quotation_id: quotation.id).should exist
+    end
+
+    it "should not find person that doesn't exist" do
+      Person.where(quotation_id: 18).should_not exist
+    end
+
   end
 
 end

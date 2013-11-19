@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131114175808) do
+ActiveRecord::Schema.define(version: 20131118191905) do
 
   create_table "people", force: true do |t|
     t.integer  "quotation_id"
@@ -35,6 +35,15 @@ ActiveRecord::Schema.define(version: 20131114175808) do
 
   add_index "people", ["email"], name: "index_people_on_email"
 
+  create_table "policies", force: true do |t|
+    t.integer  "excess"
+    t.string   "breakdown_cover"
+    t.string   "windscreen_cover"
+    t.integer  "quotation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "quotations", force: true do |t|
     t.integer  "premium"
     t.date     "calculation_date"
@@ -44,5 +53,16 @@ ActiveRecord::Schema.define(version: 20131114175808) do
   end
 
   add_index "quotations", ["code"], name: "index_quotations_on_code", unique: true
+
+  create_table "vehicles", force: true do |t|
+    t.string   "registration"
+    t.integer  "mileage"
+    t.integer  "estimated_value"
+    t.string   "parking"
+    t.date     "start_date"
+    t.integer  "quotation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

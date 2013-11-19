@@ -44,17 +44,31 @@ describe Quotation do
     it { should_not be_valid}
   end
 
-   describe "person association" do
-     let(:quote) {FactoryGirl.create(:quotation)}
-     let(:person) {FactoryGirl.create(:person, quotation: quote)}
-     it {person.quotation_id.should eq quote.id}
+   describe "associations" do
 
-     it "should destroy associated person" do
-       other = person
-       quote.destroy
-       Person.where(quotation_id: other.quotation_id).should_not exist
+     before {@quotation.save}
+     let(:person) {FactoryGirl.create(:person, quotation: @quotation)}
+     let(:policy) {FactoryGirl.create(:policy, quotation: @quotation)}
+     let(:vehicle) {FactoryGirl.create(:vehicle, quotation: @quotation)}
 
-   end
+     it "Quotation should have associations" do
+       person.save
+       policy.save
+       vehicle.save
+
+       Person.where(quotation_id: @quotation.id).should exist
+       Policy.where(quotation_id: @quotation.id).should exist
+       Vehicle.where(quotation_id: @quotation.id).should exist
+
+     end
+
+     it "should destroy all associations when deleted" do
+       @quotation.destroy
+       Person.where(quotation_id: @quotation.id).should_not exist
+       Policy.where(quotation_id: @quotation.id).should_not exist
+       Vehicle.where(quotation_id: @quotation.id).should_not exist
+
+     end
 
   end
 
