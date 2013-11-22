@@ -1,5 +1,7 @@
 class QuotationsController < ApplicationController
 
+  respond_to :html, :xml, :json
+
   def create
 
     @quotation = Quotation.new(premium:create_premium,calculation_date: Date.current,code:generate_code)
@@ -17,19 +19,17 @@ class QuotationsController < ApplicationController
           incidents.push(temp)
         end
       end
-      if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
-        person.save
-        policy.save
-        vehicle.save
-        incidents.each {|i| i.save}
-        redirect_to @quotation
+      @quotation.premium = create_premium if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
+      if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.save)
+
+        respond_with(@quotation,location: @quotation)
       else
         @quotation.destroy
-        redirect_to status:401
+        redirect_to status:400
       end
 
     else
-      redirect_to status:402
+      redirect_to status:400
 
     end
 
