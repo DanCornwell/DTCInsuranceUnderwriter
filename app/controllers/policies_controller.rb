@@ -1,8 +1,9 @@
 class PoliciesController < ApplicationController
 
   def create
-    @policy = current_quote.build_policy(policy_params)
-    if @policy.save
+    policy = Policy.new(policy_params)
+    if policy.valid?
+      return policy
 
     end
   else
@@ -11,7 +12,7 @@ class PoliciesController < ApplicationController
 
   private
 
-  def person_params
+  def policy_params
     params.require(:policy).permit(:content)
   end
 

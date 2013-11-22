@@ -4,6 +4,7 @@ DTCInsuranceUnderwriter::Application.routes.draw do
   resources :people, only: [:create]
   resources :policies, only: [:create]
   resources :vehicles, only: [:create]
+  resources :incidents, only: [:create]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

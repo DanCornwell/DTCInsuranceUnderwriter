@@ -3,6 +3,7 @@ class Person < ActiveRecord::Base
   belongs_to :quotation
 
   validates :quotation_id, presence:true, numericality: true
+  validates :title, presence: true
   validates :forename, presence:true, format: {with: /\A[a-zA-Z]+\z/}
   validates :surname, presence:true, format: {with: /\A[a-zA-Z]+\z/}
   validates :email, presence:true, format: {with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i}

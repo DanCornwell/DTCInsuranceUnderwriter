@@ -17,6 +17,7 @@ describe Person do
   it {should respond_to(:quotation)}
   its(:quotation) {should eq quotation}
 
+  it {should respond_to(:title)}
   it {should respond_to(:forename)}
   it {should respond_to(:surname)}
   it {should respond_to(:email)}

@@ -10,6 +10,7 @@ FactoryGirl.define do
 
   factory :person do
 
+    title "Mr"
     forename "John"
     surname "Jackson"
     email "jj55@aber.ac.uk"
