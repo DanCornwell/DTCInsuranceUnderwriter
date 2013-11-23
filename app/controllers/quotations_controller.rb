@@ -21,7 +21,7 @@ class QuotationsController < ApplicationController
       end
       @quotation.premium = create_premium if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.save)
-        redirect_to({:protocol => 'http://protected-bastion-3103.herokuapp.com/quote'}.merge({quote: @quotation.premium}))
+        redirect_to('http://protected-bastion-3103.herokuapp.com/quote?quote=800')
         #respond_with(@quotation,location: @quotation)
       else
         @quotation.destroy
