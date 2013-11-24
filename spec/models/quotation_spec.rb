@@ -89,6 +89,17 @@ describe Quotation do
        end
      end
 
-  end
+   end
+
+   describe "sending email" do
+     before {@quotation.save}
+     let(:person) {FactoryGirl.create(:person, quotation: @quotation)}
+
+     it "should send the email" do
+       person.save
+       QuotationMailer.send_code(@quotation).deliver
+       ActionMailer::Base.deliveries.last.to.should == [@quotation.person.email]
+    end
+ end
 
 end

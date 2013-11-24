@@ -21,32 +21,30 @@ class QuotationsController < ApplicationController
       end
       @quotation.premium = create_premium if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.save)
-        redirect_to('http://protected-bastion-3103.herokuapp.com/quote?quote=800')
+        QuotationMailer.send_code(@quotation).deliver
+        redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
         #respond_with(@quotation,location: @quotation)
       else
         @quotation.destroy
-        redirect_to status:400
+        redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
       end
 
     else
-      redirect_to status:400
+      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
 
     end
 
   end
 
-  def create_premium
-     return 1000
-  end
+  def retrieve
 
-  def generate_code
-    code = (0...6).map { (65 + rand(26)).chr }.join.downcase
-    if ((Quotation.find_by_code(code))==nil)
-      return code
-
+    quote = Quotation.find_by_code(params[:code])
+    if(quote!=nil && quote.person.email == (params[:email]))
+      redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
     else
-      generate_code
+      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
     end
+
   end
 
   private
@@ -62,6 +60,20 @@ class QuotationsController < ApplicationController
 
     def vehicle_params
       params.permit(:registration,:mileage,:estimated_value,:parking,:start_date)
+    end
+
+    def create_premium
+      return 1000
+    end
+
+    def generate_code
+      code = (0...6).map { (65 + rand(26)).chr }.join.downcase
+      if ((Quotation.find_by_code(code))==nil)
+        return code
+
+      else
+        generate_code
+      end
     end
 
 end
