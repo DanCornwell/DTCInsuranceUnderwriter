@@ -4,7 +4,7 @@ class QuotationsController < ApplicationController
 
   def create
 
-    @quotation = Quotation.new(premium:create_premium,calculation_date: Date.current,code:generate_code)
+    @quotation = Quotation.new(premium:300,calculation_date: Date.current,code:generate_code)
 
     if @quotation.save
       person = @quotation.build_person(person_params)
@@ -19,19 +19,17 @@ class QuotationsController < ApplicationController
           incidents.push(temp)
         end
       end
-      @quotation.premium = create_premium if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
-      if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.save)
+   #   @quotation.premium = create_premium(@quotation) if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
+      if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
         QuotationMailer.send_code(@quotation).deliver
         redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
-        #respond_with(@quotation,location: @quotation)
       else
         @quotation.destroy
-        redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
+        redirect_error
       end
 
     else
-      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
-
+      redirect_error
     end
 
   end
@@ -62,12 +60,50 @@ class QuotationsController < ApplicationController
       params.permit(:registration,:mileage,:estimated_value,:parking,:start_date)
     end
 
-    def create_premium
-      return 1000
+    def redirect_error
+      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
     end
 
+    # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.
+    def create_premium(quotation)
+      premium = 300
+      if(quotation.person.number_incidents>0)
+        premium += (quotation.person.number_incidents)*100
+        quotation.incidents.each  do  |i|
+          if(i.incident_type == "Head on collision")
+            premium += 100
+          elsif(i.incident_type == "Single vehicle collision")
+            premium +=75
+          else
+            premium += 85
+          end
+        end
+      end
+      if(quotation.person.license_period < 3)
+        premium += 50
+      end
+      if(quotation.policy.breakdown_cover == "At home")
+        premium += 20
+      elsif(quotation.policy.breakdown_cover == "Roadside")
+        premium += 50
+      elsif(quotation.policy.breakdown_cover == "European")
+        premium += 100
+      end
+      if(quotation.policy.windscreen_cover == "Yes")
+        premium += 30
+      end
+      if(quotation.vehicle.parking == "On driveway")
+        premium += 15
+      elsif(quotation.vehicle.parking == "On street")
+        premium += 30
+      end
+
+      return premium
+    end
+
+    # Generates a random 8 letter code. If the code already exists as a code, (by some miracle), call the method again
     def generate_code
-      code = (0...6).map { (65 + rand(26)).chr }.join.downcase
+      code = (0...8).map { (65 + rand(26)).chr }.join.downcase
       if ((Quotation.find_by_code(code))==nil)
         return code
 

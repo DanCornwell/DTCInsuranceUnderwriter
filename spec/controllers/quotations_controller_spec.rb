@@ -52,4 +52,19 @@ describe QuotationsController do
     end
   end
 
+  describe "generating code and premium" do
+
+    before {post :create, person.merge(vehicle).merge(policy).merge(incident1).merge(incident2)}
+
+    it "should generate a code" do
+      code = Quotation.first.code
+      code.should have(8).characters
+    end
+
+    it "should generate a premium" do
+      premium = Quotation.first.premium
+      premium.should be >= 300
+    end
+  end
+
 end
