@@ -42,7 +42,7 @@ describe QuotationsController do
 
     it "should not create quotation" do
       post :create, person.merge(vehicle).merge(policy).merge(incident1).merge(incident2)
-      response.should redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
+      response.should redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%data%was%incorrect.")
       expect(Quotation.count).to eq 0
       expect(Person.count).to eq 0
       expect(Vehicle.count).to eq 0
@@ -50,6 +50,20 @@ describe QuotationsController do
       expect(Incident.count).to eq 0
 
     end
+  end
+
+  describe "retrieve code" do
+
+    let(:quotation) {FactoryGirl.create(:quotation)}
+    before{quotation.save}
+    let(:other_person) {FactoryGirl.create(:person, quotation: quotation)}
+
+    it "should retrieve a quote" do
+      post :retrieve, {code:quotation.code,email:other_person.email}
+      response.should redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{quotation.premium}")
+
+    end
+
   end
 
   describe "generating code and premium" do

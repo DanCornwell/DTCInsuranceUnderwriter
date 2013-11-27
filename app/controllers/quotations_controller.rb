@@ -38,9 +38,9 @@ class QuotationsController < ApplicationController
 
     quote = Quotation.find_by_code(params[:code])
     if(quote!=nil && quote.person.email == (params[:email]))
-      redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
+      redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{quote.premium}")
     else
-      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
+      redirect_error
     end
 
   end
@@ -61,7 +61,7 @@ class QuotationsController < ApplicationController
     end
 
     def redirect_error
-      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form data was incorrect.")
+      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%data%was%incorrect.")
     end
 
     # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.
@@ -92,9 +92,9 @@ class QuotationsController < ApplicationController
       if(quotation.policy.windscreen_cover == "Yes")
         premium += 30
       end
-      if(quotation.vehicle.parking == "On driveway")
+      if(quotation.vehicle.parking == "On a driveway")
         premium += 15
-      elsif(quotation.vehicle.parking == "On street")
+      elsif(quotation.vehicle.parking == "On a street")
         premium += 30
       end
 

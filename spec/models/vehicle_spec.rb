@@ -6,7 +6,7 @@ describe Vehicle do
 
   before (:each) do
 
-    @vehicle = quotation.create_vehicle(registration:"REG123",mileage:5000,estimated_value:10000,parking:"On street",
+    @vehicle = quotation.create_vehicle(registration:"REG123",mileage:5000,estimated_value:10000,parking:"On a street",
                     start_date:Date.current)
 
   end

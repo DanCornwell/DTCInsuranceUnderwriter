@@ -42,7 +42,7 @@ FactoryGirl.define do
     registration "REG5"
     mileage 10000
     estimated_value 20000
-    parking "On driveway"
+    parking "On a driveway"
     start_date Date.new(2015,1,3)
     quotation
 
