@@ -9,4 +9,3 @@ ActionMailer::Base.smtp_settings = {
 }
 
 ActionMailer::Base.default_url_options[:host] = "protected-bastion-3103.herokuapp.com"
-Mail.register_interceptor(DevelopmentMailInterceptor) if Rails.env.development?

@@ -19,7 +19,7 @@ class QuotationsController < ApplicationController
           incidents.push(temp)
         end
       end
-   #   @quotation.premium = create_premium(@quotation) if(person.valid? && policy.valid? && vehicle.valid? && incidents.each {|i| i.valid?})
+
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
         QuotationMailer.send_code(@quotation).deliver
         redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
