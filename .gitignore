@@ -15,6 +15,9 @@
 /log/*.log
 /tmp
 
+# Ignore email password
+/config/initializers/app_env_email_password.rb
+
 # Ignore other unneeded files.
 database.yml
 doc/

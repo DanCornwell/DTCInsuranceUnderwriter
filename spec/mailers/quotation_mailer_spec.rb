@@ -10,7 +10,6 @@ describe QuotationMailer do
 
   describe "send code" do
 
-
     before do
       person.save
       @mail = QuotationMailer.send_code(quotation)
@@ -35,6 +34,16 @@ describe QuotationMailer do
 
     it "should have the quote code" do
       @mail.body.encoded.should match(quotation.code)
+    end
+
+    it "should deliver" do
+
+      @mail.deliver
+
+      sent = ActionMailer::Base.deliveries.last
+
+      @mail.should eq sent
+
     end
 
   end

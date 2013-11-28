@@ -3,7 +3,7 @@ ActionMailer::Base.smtp_settings = {
     :port                 => 587,
     :domain               => "protected-bastion-3103.herokuapp.com",
     :user_name            => "dtcinsuranceunderwriter",
-    :password             => "overwrite",
+    :password             => ENV["PASSWORD"],
     :authentication       => "plain",
     :enable_starttls_auto => true
 }

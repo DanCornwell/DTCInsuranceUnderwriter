@@ -61,7 +61,7 @@ class QuotationsController < ApplicationController
     end
 
     def redirect_error
-      redirect_to("protected-bastion-3103.herokuapp.com/error?error=Form%20data%20was%20incorrect.")
+      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%20data%20was%20incorrect.")
     end
 
     # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.

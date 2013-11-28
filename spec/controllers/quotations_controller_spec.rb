@@ -42,7 +42,7 @@ describe QuotationsController do
 
     it "should not create quotation" do
       post :create, person.merge(vehicle).merge(policy).merge(incident1).merge(incident2)
-      response.should redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%data%was%incorrect.")
+      response.should redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%20data%20was%20incorrect.")
       expect(Quotation.count).to eq 0
       expect(Person.count).to eq 0
       expect(Vehicle.count).to eq 0
