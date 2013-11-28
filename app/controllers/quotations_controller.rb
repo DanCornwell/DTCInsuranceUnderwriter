@@ -23,13 +23,29 @@ class QuotationsController < ApplicationController
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
         QuotationMailer.send_code(@quotation).deliver
         redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
+
+        details = {underwriter: 'DTC Insurance Underwriter',premium: @quotation.premium}
+        person_hash = person.attributes
+        policy_hash = policy.attributes
+        vehicle_hash = vehicle.attributes
+        incidents_hash = {}
+        if(params[:number_incidents].to_i>0)
+          incidents.each do |f|
+            i = f.attributes
+            incidents_hash.merge(i)
+          end
+        end
+        details.merge(person_hash).merge(policy_hash).merge(vehicle_hash).merge(incidents_hash)
+
+        render details,status:200
+
       else
         @quotation.destroy
-        redirect_error
+        render status:400
       end
 
     else
-      redirect_error
+      render status:400
     end
 
   end
@@ -40,7 +56,7 @@ class QuotationsController < ApplicationController
     if(quote!=nil && quote.person.email == (params[:email]))
       redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{quote.premium}")
     else
-      redirect_error
+      render status:400
     end
 
   end
@@ -58,10 +74,6 @@ class QuotationsController < ApplicationController
 
     def vehicle_params
       params.permit(:registration,:mileage,:estimated_value,:parking,:start_date)
-    end
-
-    def redirect_error
-      redirect_to("http://protected-bastion-3103.herokuapp.com/error?error=Form%20data%20was%20incorrect.")
     end
 
     # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.
