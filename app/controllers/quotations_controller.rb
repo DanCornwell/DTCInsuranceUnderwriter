@@ -24,7 +24,8 @@ class QuotationsController < ApplicationController
 
           QuotationMailer.send_code(@quotation).deliver
           details = get_details(@quotation,person,policy,vehicle,incidents)
-          respond_with(details,status:200,location: params[:host])
+          host = request.host
+          render details, status:200, location: host
 
       else
         @quotation.destroy
@@ -42,7 +43,8 @@ class QuotationsController < ApplicationController
     quote = Quotation.find_by_code(params[:code])
     if(quote!=nil && quote.person.email == (params[:email]))
       details = get_details(quote,quote.person,quote.policy,quote.vehicle,quote.incidents)
-      render details, status:200
+      host = request.host
+      render details, status:200, location: host
     else
       render status:400
     end
