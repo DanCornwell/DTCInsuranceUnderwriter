@@ -21,23 +21,10 @@ class QuotationsController < ApplicationController
       end
 
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
-        QuotationMailer.send_code(@quotation).deliver
-        redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{@quotation.premium}")
 
-        details = {underwriter: 'DTC Insurance Underwriter',premium: @quotation.premium}
-        person_hash = person.attributes
-        policy_hash = policy.attributes
-        vehicle_hash = vehicle.attributes
-        incidents_hash = {}
-        if(params[:number_incidents].to_i>0)
-          incidents.each do |f|
-            i = f.attributes
-            incidents_hash.merge(i)
-          end
-        end
-        details.merge(person_hash).merge(policy_hash).merge(vehicle_hash).merge(incidents_hash)
-
-        render details,status:200
+          QuotationMailer.send_code(@quotation).deliver
+          details = get_details(@quotation,person,policy,vehicle,incidents)
+          render details,status:200
 
       else
         @quotation.destroy
@@ -54,7 +41,8 @@ class QuotationsController < ApplicationController
 
     quote = Quotation.find_by_code(params[:code])
     if(quote!=nil && quote.person.email == (params[:email]))
-      redirect_to("http://protected-bastion-3103.herokuapp.com/quote?quote=#{quote.premium}")
+      details = get_details(quote,quote.person,quote.policy,quote.vehicle,quote.incidents)
+      render details, status:200
     else
       render status:400
     end
@@ -74,6 +62,24 @@ class QuotationsController < ApplicationController
 
     def vehicle_params
       params.permit(:registration,:mileage,:estimated_value,:parking,:start_date)
+    end
+
+    def get_details(quotation,person,policy,vehicle,incidents)
+
+      details = {underwriter: 'DTC Insurance Underwriter',premium: quotation.premium}
+      person_hash = person.attributes
+      policy_hash = policy.attributes
+      vehicle_hash = vehicle.attributes
+      incidents_hash = {}
+      if(params[:number_incidents].to_i>0)
+        incidents.each do |f|
+          i = f.attributes
+          incidents_hash.merge(i)
+        end
+      end
+      details.merge(person_hash).merge(policy_hash).merge(vehicle_hash).merge(incidents_hash)
+      return details
+
     end
 
     # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.
