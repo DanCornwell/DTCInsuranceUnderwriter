@@ -24,15 +24,15 @@ class QuotationsController < ApplicationController
 
           QuotationMailer.send_code(@quotation).deliver
           details = get_details(@quotation,person,policy,vehicle,incidents)
-          render json: details, status:200
+          respond_with(details,status:200,location: params[:host])
 
       else
         @quotation.destroy
-        respond_with(status:400,location:"nil")
+        respond_with(status:400,location: params[:host])
       end
 
     else
-      respond_with(status:400,location:"nil")
+      respond_with(status:400,location: params[:host])
     end
 
   end
