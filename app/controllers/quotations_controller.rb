@@ -24,7 +24,7 @@ class QuotationsController < ApplicationController
 
           QuotationMailer.send_code(@quotation).deliver
           details = get_details(@quotation,person,policy,vehicle,incidents)
-          respond_with(details,status:200,location:"nil")
+          render json: details, status:200
 
       else
         @quotation.destroy
