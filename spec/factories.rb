@@ -3,7 +3,7 @@ FactoryGirl.define do
   factory :quotation do
 
     premium     3000
-    calculation_date    Date.new(2000,1,1)
+    calculation_date    Date.new(2000,1,1).strftime("%Y-%m-%d")
     sequence(:code) {|n| "code#{n}"}
 
   end
@@ -14,7 +14,7 @@ FactoryGirl.define do
     forename "John"
     surname "Jackson"
     email "jj55@aber.ac.uk"
-    dob Date.new(1990,1,1)
+    dob Date.new(1990,1,1).strftime("%Y-%m-%d")
     telephone '07785728345'
     street "11 Typical Street"
     city "Simcity"
@@ -43,7 +43,7 @@ FactoryGirl.define do
     mileage 10000
     estimated_value 20000
     parking "On a driveway"
-    start_date Date.new(2015,1,3)
+    start_date Date.new(2015,1,3).strftime("%Y-%m-%d")
     quotation
 
   end

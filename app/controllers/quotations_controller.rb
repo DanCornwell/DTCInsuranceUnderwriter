@@ -23,17 +23,16 @@ class QuotationsController < ApplicationController
       if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
 
           QuotationMailer.send_code(@quotation).deliver
-          details = get_details(@quotation,person,policy,vehicle,incidents)
-          host = request.host
-          render details, status:200, location: host
+          details = get_details(@quotation,@quotation.person,@quotation.policy,@quotation.vehicle,@quotation.incidents)
+          render json: details
 
       else
         @quotation.destroy
-        respond_with(status:400,location: params[:host])
+        render json: {error: "The form data was incorrect. Please try again."},status:400
       end
 
     else
-      respond_with(status:400,location: params[:host])
+        render json: {error: "The form data was incorrect. Please try again."},status:400
     end
 
   end
@@ -43,10 +42,9 @@ class QuotationsController < ApplicationController
     quote = Quotation.find_by_code(params[:code])
     if(quote!=nil && quote.person.email == (params[:email]))
       details = get_details(quote,quote.person,quote.policy,quote.vehicle,quote.incidents)
-      host = request.host
-      render details, status:200, location: host
+      render json: details
     else
-      render status:400
+      render json: {error: "No quote was found with that quote and email combination. Please check your code and try again."},status:400
     end
 
   end
@@ -68,19 +66,46 @@ class QuotationsController < ApplicationController
 
     def get_details(quotation,person,policy,vehicle,incidents)
 
-      details = {underwriter: 'DTC Insurance Underwriter',premium: quotation.premium}
-      person_hash = person.attributes
-      policy_hash = policy.attributes
-      vehicle_hash = vehicle.attributes
+      underwriter_details = {underwriter: 'DTC Insurance Underwriter',premium: quotation.premium}
+      person_hash = {
+          title: person[:title],
+          forename: person[:forename],
+          surname: person[:surname],
+          email: person[:email],
+          dob: person[:dob],
+          telephone: person[:telephone],
+          street: person[:street],
+          city: person[:city],
+          county: person[:county],
+          postcode: person[:postcode],
+          license_type: person[:license_type],
+          license_period: person[:license_period],
+          occupation: person[:occupation],
+          number_incidents: person[:number_incidents]
+      }
+      policy_hash = {
+          excess: policy[:excess],
+          breakdown_cover: policy[:breakdown_cover],
+          windscreen_cover: policy[:windscreen_cover]
+      }
+      vehicle_hash = {
+          registration: vehicle[:registration],
+          mileage: vehicle[:mileage],
+          estimated_value: vehicle[:estimated_value],
+          parking: vehicle[:parking],
+          start_date: vehicle[:start_date]
+      }
       incidents_hash = {}
-      if(params[:number_incidents].to_i>0)
-        incidents.each do |f|
-          i = f.attributes
-          incidents_hash.merge(i)
-        end
+      if(person[:number_incidents].to_i>0)
+        (1..person[:number_incidents].to_i).each do |i|
+            incidents_hash[:"incident_date#{i}"] = incidents[i-1][:incident_date]
+            incidents_hash[:"claim_sum#{i}"] = incidents[i-1][:claim_sum]
+            incidents_hash[:"incident_type#{i}"] = incidents[i-1][:incident_type]
+            incidents_hash[:"description#{i}"] = incidents[i-1][:description]
+          end
       end
-      details.merge(person_hash).merge(policy_hash).merge(vehicle_hash).merge(incidents_hash)
-      return details
+      full_details = underwriter_details.merge(person_hash).merge(vehicle_hash).merge(incidents_hash).merge(policy_hash)
+      return full_details
 
     end
 
