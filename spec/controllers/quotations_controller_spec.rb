@@ -51,7 +51,7 @@ describe QuotationsController do
       post :create, person.merge(vehicle).merge(policy).merge(incident1).merge(incident2)
       expect(response.code == 400)
       parsed_response = JSON.parse(response.body).symbolize_keys
-      parsed_response.should == {error: "The form data was incorrect. Please try again."}
+      parsed_response.should == {underwriter: 'DTC Insurance Underwriter', error: "The form data was incorrect. Please try again."}
       expect(Quotation.count).to eq 0
       expect(Person.count).to eq 0
       expect(Vehicle.count).to eq 0
@@ -100,17 +100,17 @@ describe QuotationsController do
       post :retrieve, {code: 'fake', email: @email}
       expect(response.code == 400)
       parsed_response = JSON.parse(response.body).symbolize_keys
-      parsed_response.should == {error: "No quote was found with that quote and email combination. Please check your code and try again."}
+      parsed_response.should == {underwriter: 'DTC Insurance Underwriter', error: "No quote was found with that quote and email combination. Please check your code and try again."}
 
       post :retrieve, {code: @retrieval_code, email: 'email@email.com'}
       expect(response.code == 400)
       parsed_response = JSON.parse(response.body).symbolize_keys
-      parsed_response.should == {error: "No quote was found with that quote and email combination. Please check your code and try again."}
+      parsed_response.should == {underwriter: 'DTC Insurance Underwriter', error: "No quote was found with that quote and email combination. Please check your code and try again."}
 
       post :retrieve, {code: 'fake', email: 'email@email.com'}
       expect(response.code == 400)
       parsed_response = JSON.parse(response.body).symbolize_keys
-      parsed_response.should == {error: "No quote was found with that quote and email combination. Please check your code and try again."}
+      parsed_response.should == {underwriter: 'DTC Insurance Underwriter', error: "No quote was found with that quote and email combination. Please check your code and try again."}
 
     end
 

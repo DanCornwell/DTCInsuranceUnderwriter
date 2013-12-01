@@ -28,11 +28,11 @@ class QuotationsController < ApplicationController
 
       else
         @quotation.destroy
-        render json: {error: "The form data was incorrect. Please try again."},status:400
+        render json: get_error("The form data was incorrect. Please try again."),status:400
       end
 
     else
-        render json: {error: "The form data was incorrect. Please try again."},status:400
+        render json: get_error("The form data was incorrect. Please try again."),status:400
     end
 
   end
@@ -44,7 +44,7 @@ class QuotationsController < ApplicationController
       details = get_details(quote,quote.person,quote.policy,quote.vehicle,quote.incidents)
       render json: details
     else
-      render json: {error: "No quote was found with that quote and email combination. Please check your code and try again."},status:400
+      render json: get_error("No quote was found with that quote and email combination. Please check your code and try again."),status:400
     end
 
   end
@@ -107,6 +107,10 @@ class QuotationsController < ApplicationController
       full_details = underwriter_details.merge(person_hash).merge(vehicle_hash).merge(incidents_hash).merge(policy_hash)
       return full_details
 
+    end
+
+    def get_error(error)
+      return {underwriter: 'DTC Insurance Underwriter', error: error}
     end
 
     # The code to create a premium. Demonstrates how we can use the supplied data to influence the premium.
