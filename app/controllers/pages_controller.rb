@@ -1,4 +1,4 @@
-class QuotationsController < ApplicationController
+class PagesController < ApplicationController
 
     def index
 
