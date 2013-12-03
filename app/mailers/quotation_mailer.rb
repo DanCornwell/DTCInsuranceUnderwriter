@@ -1,5 +1,7 @@
 class QuotationMailer < ActionMailer::Base
 
+    # Sends an email to the user
+
     default from: "no-reply@dtcinsuranceunderwriter.com"
 
      def send_code(quotation)

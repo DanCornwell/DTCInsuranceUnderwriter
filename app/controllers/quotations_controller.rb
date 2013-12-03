@@ -1,69 +1,86 @@
 class QuotationsController < ApplicationController
 
-  respond_to :html, :xml, :json
-
+  # Creates a quotation in the database
   def create
 
-    @quotation = Quotation.new(premium:300,calculation_date: Date.current,code:generate_code)
+    # Creates a quotation with code and a placeholder premium
+    quotation = Quotation.new(premium:300,calculation_date: Date.current,code:generate_code)
 
-    if @quotation.save
-      person = @quotation.build_person(person_params)
-      policy = @quotation.build_policy(policy_params)
-      vehicle = @quotation.build_vehicle(vehicle_params)
+    if quotation.save
+      # Build a person, policy and vehicle from the params using the quotation
+      person = quotation.build_person(person_params)
+      policy = quotation.build_policy(policy_params)
+      vehicle = quotation.build_vehicle(vehicle_params)
       incidents = []
+      # If there are incidents get them from the params and add them to the incidents array
       if(params[:number_incidents].to_i>0)
         (1..params[:number_incidents].to_i).each do |i|
           incident_params = {incident_date: params[("incident_date#{i}").to_sym],claim_sum: params[("claim_sum#{i}").to_sym],
                 incident_type: params[("incident_type#{i}").to_sym],description: params[("description#{i}").to_sym]}
-          temp = @quotation.incidents.build(incident_params)
+          temp = quotation.incidents.build(incident_params)
           incidents.push(temp)
         end
       end
 
-      if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && @quotation.update_attributes(premium: create_premium(@quotation)))
-
-          QuotationMailer.send_code(@quotation).deliver
-          details = get_details(@quotation,@quotation.person,@quotation.policy,@quotation.vehicle,@quotation.incidents)
+      # If all models save and the quotation premium updates
+      if(person.save && policy.save && vehicle.save && incidents.each {|i| i.save} && quotation.update_attributes(premium: create_premium(quotation)))
+          # Send a mail to the user with the retrieval code
+          QuotationMailer.send_code(quotation).deliver
+          # Get details and render them in the response
+          details = get_details(quotation,quotation.person,quotation.policy,quotation.vehicle,quotation.incidents)
           render json: details
-
+      # Else something didn't save or premium didn't update
       else
-        @quotation.destroy
+        # Destroy the quotation in the database (will destroy all associations)
+        quotation.destroy
+        # Render an error in the response with status code 400
         render json: get_error("The form data was incorrect. Please try again."),status:400
       end
 
+    # Quotation didn't save, so render error in the response with status code 400
     else
         render json: get_error("The form data was incorrect. Please try again."),status:400
     end
 
   end
 
+  # Retrieves a quotation from the database
   def retrieve
 
+    # Find the quote with the given code, returns nil if none could be found
     quote = Quotation.find_by_code(params[:code])
+    # If quote is not nil and the given email matches
     if(quote!=nil && quote.person.email == (params[:email]))
+      # Get details and render them in response
       details = get_details(quote,quote.person,quote.policy,quote.vehicle,quote.incidents)
       render json: details
+    # Else quote was not found or email wrong so render an error message and status 400
     else
       render json: get_error("No quote was found with that quote and email combination. Please check your code and try again."),status:400
     end
 
   end
 
+  # Private methods the controller uses
   private
 
+    # Uses only the params the person model uses
     def person_params
       params.permit(:title,:forename,:surname,:email,:dob,:telephone,:street,:city,:county,:postcode,:license_type,
                                      :license_period,:occupation,:number_incidents)
     end
 
+    # Uses only the params the policy model uses
     def policy_params
       params.permit(:excess,:breakdown_cover,:windscreen_cover)
     end
 
+    # Uses only the params the vehicle model uses
     def vehicle_params
       params.permit(:registration,:mileage,:estimated_value,:parking,:start_date)
     end
 
+    # Returns a hash containing all the details the user supplied, along with details the underwriter needs to send back
     def get_details(quotation,person,policy,vehicle,incidents)
 
       underwriter_details = {underwriter: 'DTC Insurance Underwriter',premium: quotation.premium}
@@ -109,6 +126,7 @@ class QuotationsController < ApplicationController
 
     end
 
+    # Returns a hash of the underwriter's name and an error message
     def get_error(error)
       return {underwriter: 'DTC Insurance Underwriter', error: error}
     end
