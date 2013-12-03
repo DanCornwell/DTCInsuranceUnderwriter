@@ -29,7 +29,5 @@ module DTCInsuranceUnderwriter
       end
     end
 
-    config.force_ssl = false
-
   end
 end
